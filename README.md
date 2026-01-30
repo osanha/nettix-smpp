@@ -6,11 +6,21 @@ SMPP 3.4 protocol implementation built on [nettix](https://github.com/osanha/net
 
 nettix-smpp provides a complete SMPP (Short Message Peer-to-Peer) protocol implementation for building SMS applications. It includes both SME (Short Message Entity) client and SMSC (Short Message Service Center) server components with full PDU support.
 
+The **SMPP Server** component is primarily designed as an **SMSC simulator** for testing SME (SMPP Client) implementations, enabling developers to validate their client code without requiring a live SMSC connection.
+
+### Why nettix-smpp?
+
+- **High Performance, Lightweight**: Built on asynchronous non-blocking I/O, enabling efficient handling of concurrent connections with minimal resource consumption.
+
+- **High Developer Productivity**: Powered by [nettix](https://github.com/osanha/nettix), the framework handles all network-level concerns—automatic reconnection on connection loss, enquire_link keep-alive management, and session lifecycle—so developers can focus solely on business logic: sending messages and processing delivery results.
+
+- **Production-Ready Client**: `SmppClient` provides a robust, battle-tested SME implementation suitable for production SMS gateway integrations.
+
 ## Features
 
 - **Full SMPP 3.4 Support**: Complete PDU implementation including all bind modes
 - **SME Client (SmppClient)**: Connect to SMSC for sending/receiving SMS
-- **SMSC Server (SmppServer)**: Build your own SMSC or SMSC simulator
+- **SMSC Server (SmppServer)**: Test your SME client without a live SMSC
 - **Bind Modes**: Transmitter, Receiver, and Transceiver modes
 - **Delivery Receipts**: MT-SMS delivery status handling with `SmppClientListener` callbacks
 - **MO/MT Support**: Both Mobile Originated and Mobile Terminated messaging
