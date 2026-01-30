@@ -664,6 +664,215 @@ classDiagram
 | `SmppLogger` | extends | `SimpleChannelHandler` (netty) | PDU logging |
 | `SmppClientHandler` | extends | `SimpleChannelUpstreamHandler` (netty) | Message reception handling |
 
+## PDU Class Hierarchy
+
+The PDU (Protocol Data Unit) classes follow a hierarchical structure for code reuse and type safety.
+
+```mermaid
+classDiagram
+    direction TB
+
+    %% Base PDU class
+    class SmppPdu {
+        <<abstract>>
+        -SmppCommand id
+        -SmppStatus status
+        -int sequence
+        -List~OptionalParam~ options
+        +encode() ChannelBuffer
+        +decode(ChannelBuffer)
+        #encodeMandatory(ChannelBuffer)
+        #decodeMandatory(ChannelBuffer)
+    }
+
+    %% Abstract intermediate classes
+    class BindPdu {
+        <<abstract>>
+        -String systemId
+        -String password
+        -String systemType
+        -int interfaceVersion
+        -int addrTon
+        -int addrNpi
+        -String addressRange
+    }
+
+    class SmPdu {
+        <<abstract>>
+        -String serviceType
+        -String sourceAddr
+        -String destinationAddr
+        -int esmClass
+        -int dataCoding
+        -int registeredDelivery
+        -ChannelBuffer shortMessage
+    }
+
+    class ResponsePdu {
+        <<abstract>>
+    }
+
+    class BindRespPdu {
+        <<abstract>>
+        -String systemId
+    }
+
+    class SmRespPdu {
+        <<abstract>>
+        -String messageId
+    }
+
+    %% Bind Request PDUs
+    class BindTransmitter {
+        bind_transmitter
+    }
+    class BindReceiver {
+        bind_receiver
+    }
+    class BindTransceiver {
+        bind_transceiver
+    }
+
+    %% Bind Response PDUs
+    class BindTransmitterResp {
+        bind_transmitter_resp
+    }
+    class BindReceiverResp {
+        bind_receiver_resp
+    }
+    class BindTransceiverResp {
+        bind_transceiver_resp
+    }
+
+    %% Message PDUs
+    class SubmitSm {
+        submit_sm
+    }
+    class DeliverSm {
+        deliver_sm
+    }
+
+    %% Message Response PDUs
+    class SubmitSmResp {
+        submit_sm_resp
+    }
+    class DeliverSmResp {
+        deliver_sm_resp
+    }
+
+    %% Session PDUs (direct SmppPdu)
+    class EnquireLink {
+        enquire_link
+    }
+    class Unbind {
+        unbind
+    }
+    class QuerySm {
+        query_sm
+    }
+    class CancelSm {
+        cancel_sm
+    }
+    class ReplaceSm {
+        replace_sm
+    }
+    class DataSm {
+        data_sm
+    }
+    class SubmitMulti {
+        submit_multi
+    }
+    class AlertNotification {
+        alert_notification
+    }
+    class OutBind {
+        outbind
+    }
+
+    %% Simple Response PDUs
+    class GenericNack {
+        generic_nack
+    }
+    class EnquireLinkResp {
+        enquire_link_resp
+    }
+    class UnbindResp {
+        unbind_resp
+    }
+    class QuerySmResp {
+        query_sm_resp
+    }
+    class CancelSmResp {
+        cancel_sm_resp
+    }
+    class ReplaceSmResp {
+        replace_sm_resp
+    }
+    class DataSmResp {
+        data_sm_resp
+    }
+    class SubmitMultiResp {
+        submit_multi_resp
+    }
+
+    %% Inheritance - Abstract classes
+    SmppPdu <|-- BindPdu
+    SmppPdu <|-- SmPdu
+    SmppPdu <|-- ResponsePdu
+    ResponsePdu <|-- BindRespPdu
+    ResponsePdu <|-- SmRespPdu
+
+    %% Inheritance - Bind PDUs
+    BindPdu <|-- BindTransmitter
+    BindPdu <|-- BindReceiver
+    BindPdu <|-- BindTransceiver
+
+    %% Inheritance - Bind Response PDUs
+    BindRespPdu <|-- BindTransmitterResp
+    BindRespPdu <|-- BindReceiverResp
+    BindRespPdu <|-- BindTransceiverResp
+
+    %% Inheritance - Message PDUs
+    SmPdu <|-- SubmitSm
+    SmPdu <|-- DeliverSm
+
+    %% Inheritance - Message Response PDUs
+    SmRespPdu <|-- SubmitSmResp
+    SmRespPdu <|-- DeliverSmResp
+
+    %% Inheritance - Direct SmppPdu children
+    SmppPdu <|-- EnquireLink
+    SmppPdu <|-- Unbind
+    SmppPdu <|-- QuerySm
+    SmppPdu <|-- CancelSm
+    SmppPdu <|-- ReplaceSm
+    SmppPdu <|-- DataSm
+    SmppPdu <|-- SubmitMulti
+    SmppPdu <|-- AlertNotification
+    SmppPdu <|-- OutBind
+
+    %% Inheritance - Simple Response PDUs
+    ResponsePdu <|-- GenericNack
+    ResponsePdu <|-- EnquireLinkResp
+    ResponsePdu <|-- UnbindResp
+    ResponsePdu <|-- QuerySmResp
+    ResponsePdu <|-- CancelSmResp
+    ResponsePdu <|-- ReplaceSmResp
+    ResponsePdu <|-- DataSmResp
+    ResponsePdu <|-- SubmitMultiResp
+```
+
+### PDU Hierarchy Summary
+
+| Base Class | Description | Concrete PDUs |
+|------------|-------------|---------------|
+| `SmppPdu` | Root class for all PDUs | `EnquireLink`, `Unbind`, `QuerySm`, `CancelSm`, `ReplaceSm`, `DataSm`, `SubmitMulti`, `AlertNotification`, `OutBind` |
+| `BindPdu` | Bind request PDUs with authentication fields | `BindTransmitter`, `BindReceiver`, `BindTransceiver` |
+| `SmPdu` | Message PDUs with addressing and content fields | `SubmitSm`, `DeliverSm` |
+| `ResponsePdu` | Base for all response PDUs | `GenericNack`, `EnquireLinkResp`, `UnbindResp`, `QuerySmResp`, `CancelSmResp`, `ReplaceSmResp`, `DataSmResp`, `SubmitMultiResp` |
+| `BindRespPdu` | Bind response PDUs | `BindTransmitterResp`, `BindReceiverResp`, `BindTransceiverResp` |
+| `SmRespPdu` | Message response PDUs with message_id | `SubmitSmResp`, `DeliverSmResp` |
+
 ## Architecture
 
 ```
